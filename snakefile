@@ -1,8 +1,8 @@
-READS = ["example_R1", "example_R2"]
+
 
 rule fastqc:
     input:
-        expand("data/{reads}.fastq.gz", reads=READS)
+        "data/{read}.fastq.gz"
     output:
         html="QC/{read}.html",
         zip="QC/{read}_fastqc.zip" # the suffix _fastqc.zip is necessary for multiqc to find the file. If not using multiqc, you are free to choose an arbitrary filename
