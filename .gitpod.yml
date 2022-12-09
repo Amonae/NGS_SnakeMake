@@ -9,7 +9,7 @@ tasks:
       echo "*" > .gitignore
       conda init
       source ~/.bashrc
-      
+      clear
       
 vscode:
   extensions:
