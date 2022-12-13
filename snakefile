@@ -14,6 +14,7 @@ rule fastqc:
     wrapper:
         "v1.20.0/bio/fastqc"
 
+
 rule trimmomatic:
     input:
         r1="data/{sample}_R1.fastq.gz",
@@ -39,4 +40,33 @@ rule trimmomatic:
     wrapper:
         "v1.20.0/bio/trimmomatic/pe"
         
-  
+        
+  rule bwa_index:
+    input:
+        "{chromosome}.fa.gz",
+    output:
+        idx=multiext("{chromosome}", ".amb", ".ann", ".bwt", ".pac", ".sa"),
+    log:
+        "logs/bwa_index/{chromosome}.log",
+    params:
+        algorithm="bwtsw",
+    wrapper:
+        "v1.21.0/bio/bwa/index"      
+        
+        
+  rule bwa_mem_sortsam:
+    input:
+        reads=["trimmed/{sample}.1.fastq.gz", "trimmed/{sample}.1.fastq.gz"],
+        idx=multiext("chr21", ".amb", ".ann", ".bwt", ".pac", ".sa"),
+    output:
+        "mapped/{sample}.bam",
+    log:
+        "logs/bwa_mem/{sample}.log",
+    params:
+        extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
+        sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
+        sort_order="coordinate",  # Can be 'queryname' or 'coordinate'.
+        sort_extra="",  # Extra args for samtools/picard.
+    threads: 8
+    wrapper:
+        "v1.21.0/bio/bwa/mem"
