@@ -43,9 +43,9 @@ rule trimmomatic:
         
   rule bwa_index:
     input:
-        "{chromosome}.fa.gz",
+        "data/{chromosome}.fa.gz",
     output:
-        idx=multiext("{chromosome}", ".amb", ".ann", ".bwt", ".pac", ".sa"),
+        idx=multiext("index/{chromosome}", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     log:
         "logs/bwa_index/{chromosome}.log",
     params:
@@ -57,7 +57,7 @@ rule trimmomatic:
   rule bwa_mem_sortsam:
     input:
         reads=["trimmed/{sample}.1.fastq.gz", "trimmed/{sample}.1.fastq.gz"],
-        idx=multiext("chr21", ".amb", ".ann", ".bwt", ".pac", ".sa"),
+        idx=multiext("index/{chromosome}", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     output:
         "mapped/{sample}.bam",
     log:
