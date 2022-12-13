@@ -1,2 +1,2 @@
 # NGS_SnakeMake
-Practicing SnakeMake using BRCA NGS data
+SnakeMake workflow for variant calling
