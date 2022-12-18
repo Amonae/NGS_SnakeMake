@@ -70,3 +70,69 @@ rule trimmomatic:
     threads: 8
     wrapper:
         "v1.21.0/bio/bwa/mem"
+   
+   
+ rule mark_duplicates:
+    input:
+        bams="mapped/{sample}.bam",
+    output:
+        bam="dedup/{sample}.bam",
+        metrics="dedup/{sample}.metrics.txt",
+    log:
+        "logs/picard/dedup/{sample}.log",
+    params:
+        extra="--REMOVE_DUPLICATES true",
+    resources:
+        mem_mb=1024,
+    wrapper:
+        "v1.21.0/bio/picard/markduplicates" 
+    
+    
+rule samtools_index:
+    input:
+        "dedup/{sample}.bam",
+    output:
+        "mapped/{sample}.sorted.bam.bai",
+    log:
+        "logs/samtools_index/{sample}.log",
+    params:
+        extra="",  # optional params string
+    threads: 4 
+    wrapper:
+        "v1.21.0/bio/samtools/index"
+        
+    
+ rule samtools_idxstats:
+    input:
+        bam="dedup/{sample}.bam",
+        idx="mapped/{sample}.bam.bai",
+    output:
+        "mapped/{sample}.bam.idxstats",
+    log:
+        "logs/samtools/idxstats/{sample}.log",
+    params:
+        extra="",
+    wrapper:
+        "v1.21.0/bio/samtools/idxstats"
+        
+        
+rule freebayes:
+    input:
+        ref="data/{chromosome}.fa.gz",
+        samples="dedup/{sample}.bam",
+        # the matching BAI indexes have to present for freebayes
+        indexes="mapped/{sample}.bam.bai",
+        # optional BED file specifying chromosomal regions on which freebayes
+        # should run, e.g. all regions that show coverage
+        #regions="path/to/region-file.bed"
+    output:
+        "calls/{sample}.vcf",  # either .vcf or .bcf
+    log:
+        "logs/freebayes/{sample}.log",
+    params:
+        extra="",  # optional parameters
+        chunksize=100000,  # reference genome chunk size for parallelization (default: 100000)
+        normalize=False,  # optional flag to use bcftools norm to normalize indels (Valid params are -a, -f, -m, -D or -d)
+    threads: 2
+    wrapper:
+        "v1.21.0/bio/freebayes"
