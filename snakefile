@@ -48,7 +48,7 @@ rule trimmomatic:
         "v1.20.0/bio/trimmomatic/pe"
         
         
-  rule bwa_index:
+rule bwa_index:
     input:
         "data/{chromosome}.fa.gz",
     output:
@@ -61,7 +61,7 @@ rule trimmomatic:
         "v1.21.0/bio/bwa/index"      
         
         
-  rule bwa_mem_sortsam:
+rule bwa_mem_sortsam:
     input:
         reads=["trimmed/{sample}.1.fastq.gz", "trimmed/{sample}.2.fastq.gz"],
         idx=multiext("index/{chromosome}", ".amb", ".ann", ".bwt", ".pac", ".sa"),
@@ -79,7 +79,7 @@ rule trimmomatic:
         "v1.21.0/bio/bwa/mem"
    
    
- rule mark_duplicates:
+rule mark_duplicates:
     input:
         bams="mapped/{sample}.bam",
     output:
@@ -109,7 +109,7 @@ rule samtools_index:
         "v1.21.0/bio/samtools/index"
         
     
- rule samtools_idxstats:
+rule samtools_idxstats:
     input:
         bam="mapped/{sample}_dedup.bam",
         idx="mapped/{sample}_dedup.bam.bai",
