@@ -2,8 +2,6 @@
 rule all:
     input: 
        "calls/example.vcf",
-       "QC/example_R1.html",
-       "QC/example_R2.html"
        "mapped/example.bam.idxstats",
        "mapped/example_dedup.bam.flagstat"
        
