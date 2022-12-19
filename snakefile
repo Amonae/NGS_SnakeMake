@@ -1,5 +1,12 @@
 
-
+rule all:
+    input: 
+       "calls/{sample}.vcf",
+       "QC/{read}.html",
+       "mapped/{sample}.bam.idxstats",
+       "mapped/{sample}_dedup.bam.flagstat"
+       
+       
 rule fastqc:
     input:
         "data/{read}.fastq.gz"
@@ -114,15 +121,21 @@ rule samtools_index:
         extra="",
     wrapper:
         "v1.21.0/bio/samtools/idxstats"
-     
-     
-rule normalize_fasta
-    input: 
-        "data/{chromosome}.fa.gz"
-    output: 
-        "data/{chromosome}_normalized.fa.gz"
-    shell:
-        "picard NormalizeFasta I={input} O={output}"
+
+
+rule samtools_flagstat:
+    input:
+        "mapped/{sample}_dedup.bam",
+    output:
+        "mapped/{sample}_dedup.bam.flagstat",
+    log:
+        "logs/samtools/flagstats/{sample}.log",
+    params:
+        extra="",  # optional params string
+    wrapper:
+        "v1.21.0/bio/samtools/flagstat"
+        
+        
 rule unzip:
     input:
         "data/{sample}.fa.gz"
@@ -144,9 +157,10 @@ rule samtools_fai:
     wrapper:
         "v1.21.0/bio/samtools/faidx"
 
+
 rule freebayes:
     input:
-        ref="data/{chromosome}_normalized.fa.gz",
+        ref="data/{chromosome}.fa",
         samples="mapped/{sample}_dedup.bam",
         # the matching BAI indexes have to present for freebayes
         indexes="mapped/{sample}_dedup.bam.bai",
