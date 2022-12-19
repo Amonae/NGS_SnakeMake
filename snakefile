@@ -120,10 +120,29 @@ rule normalize_fasta
     input: 
         "data/{chromosome}.fa.gz"
     output: 
-        "data/{chromosome}_normalized.fa.gz
+        "data/{chromosome}_normalized.fa.gz"
     shell:
         "picard NormalizeFasta I={input} O={output}"
-
+rule unzip:
+    input:
+        "data/{sample}.fa.gz"
+    output:
+        "data/{sample}.fa"
+    shell:
+        "gunzip -c {input} >{output}"
+        
+        
+rule samtools_fai:
+    input:
+       "data/{sample}.fa"
+    output:
+        "data/{sample}.fa.fai",
+    log:
+        "logs/samtools/index/{sample}.log",
+    params:
+        extra="",  # optional params string
+    wrapper:
+        "v1.21.0/bio/samtools/faidx"
 
 rule freebayes:
     input:
