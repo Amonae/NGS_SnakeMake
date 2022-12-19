@@ -1,10 +1,11 @@
 
 rule all:
     input: 
-       "calls/{sample}.vcf",
-       "QC/{read}.html",
-       "mapped/{sample}.bam.idxstats",
-       "mapped/{sample}_dedup.bam.flagstat"
+       "calls/example.vcf",
+       "QC/example_R1.html",
+       "QC/example_R2.html"
+       "mapped/example.bam.idxstats",
+       "mapped/example_dedup.bam.flagstat"
        
        
 rule fastqc:
@@ -64,7 +65,7 @@ rule bwa_index:
 rule bwa_mem_sortsam:
     input:
         reads=["trimmed/{sample}.1.fastq.gz", "trimmed/{sample}.2.fastq.gz"],
-        idx=multiext("index/{chromosome}", ".amb", ".ann", ".bwt", ".pac", ".sa"),
+        idx=multiext("index/chr21", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     output:
         "mapped/{sample}.bam",
     log:
@@ -99,7 +100,7 @@ rule samtools_index:
     input:
         "mapped/{sample}_dedup.bam",
     output:
-        "mapped/{sample}_dedup.sorted.bam.bai",
+        "mapped/{sample}_dedup.bam.bai",
     log:
         "logs/samtools/index/{sample}.log",
     params:
@@ -160,7 +161,7 @@ rule samtools_fai:
 
 rule freebayes:
     input:
-        ref="data/{chromosome}.fa",
+        ref="data/chr21.fa",
         samples="mapped/{sample}_dedup.bam",
         # the matching BAI indexes have to present for freebayes
         indexes="mapped/{sample}_dedup.bam.bai",
