@@ -47,7 +47,7 @@ rule trimmomatic:
     output:
         idx=multiext("index/{chromosome}", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     log:
-        "logs/bwa_index/{chromosome}.log",
+        "logs/bwa/index/{chromosome}.log",
     params:
         algorithm="bwtsw",
     wrapper:
@@ -56,12 +56,12 @@ rule trimmomatic:
         
   rule bwa_mem_sortsam:
     input:
-        reads=["trimmed/{sample}.1.fastq.gz", "trimmed/{sample}.1.fastq.gz"],
+        reads=["trimmed/{sample}.1.fastq.gz", "trimmed/{sample}.2.fastq.gz"],
         idx=multiext("index/{chromosome}", ".amb", ".ann", ".bwt", ".pac", ".sa"),
     output:
         "mapped/{sample}.bam",
     log:
-        "logs/bwa_mem/{sample}.log",
+        "logs/bwa/mem_align/{sample}.log",
     params:
         extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
         sorting="samtools",  # Can be 'none', 'samtools' or 'picard'.
@@ -76,10 +76,10 @@ rule trimmomatic:
     input:
         bams="mapped/{sample}.bam",
     output:
-        bam="dedup/{sample}.bam",
-        metrics="dedup/{sample}.metrics.txt",
+        bam="mapped/{sample}_dedup.bam",
+        metrics="mapped/{sample}_dedup.metrics.txt",
     log:
-        "logs/picard/dedup/{sample}.log",
+        "logs/dedup/{sample}.log",
     params:
         extra="--REMOVE_DUPLICATES true",
     resources:
@@ -90,11 +90,11 @@ rule trimmomatic:
     
 rule samtools_index:
     input:
-        "dedup/{sample}.bam",
+        "mapped/{sample}_dedup.bam",
     output:
-        "mapped/{sample}.sorted.bam.bai",
+        "mapped/{sample}_dedup.sorted.bam.bai",
     log:
-        "logs/samtools_index/{sample}.log",
+        "logs/samtools/index/{sample}.log",
     params:
         extra="",  # optional params string
     threads: 4 
@@ -104,8 +104,8 @@ rule samtools_index:
     
  rule samtools_idxstats:
     input:
-        bam="dedup/{sample}.bam",
-        idx="mapped/{sample}.bam.bai",
+        bam="mapped/{sample}_dedup.bam",
+        idx="mapped/{sample}_dedup.bam.bai",
     output:
         "mapped/{sample}.bam.idxstats",
     log:
@@ -119,16 +119,13 @@ rule samtools_index:
 rule freebayes:
     input:
         ref="data/{chromosome}.fa.gz",
-        samples="dedup/{sample}.bam",
+        samples="mapped/{sample}_dedup.bam",
         # the matching BAI indexes have to present for freebayes
-        indexes="mapped/{sample}.bam.bai",
-        # optional BED file specifying chromosomal regions on which freebayes
-        # should run, e.g. all regions that show coverage
-        #regions="path/to/region-file.bed"
+        indexes="mapped/{sample}_dedup.bam.bai",
     output:
         "calls/{sample}.vcf",  # either .vcf or .bcf
     log:
-        "logs/freebayes/{sample}.log",
+        "logs/freebayes/{sample}_dedup.log",
     params:
         extra="",  # optional parameters
         chunksize=100000,  # reference genome chunk size for parallelization (default: 100000)
