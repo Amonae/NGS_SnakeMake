@@ -114,11 +114,20 @@ rule samtools_index:
         extra="",
     wrapper:
         "v1.21.0/bio/samtools/idxstats"
-        
-        
+     
+     
+rule normalize_fasta
+    input: 
+        "data/{chromosome}.fa.gz"
+    output: 
+        "data/{chromosome}_normalized.fa.gz
+    shell:
+        "picard NormalizeFasta I={input} O={output}"
+
+
 rule freebayes:
     input:
-        ref="data/{chromosome}.fa.gz",
+        ref="data/{chromosome}_normalized.fa.gz",
         samples="mapped/{sample}_dedup.bam",
         # the matching BAI indexes have to present for freebayes
         indexes="mapped/{sample}_dedup.bam.bai",
