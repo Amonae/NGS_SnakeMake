@@ -12,4 +12,4 @@ Tools include:
 7. Samtools index, idxstats, flagstat, faidx
 8. Freebayes
 
-
+![dag](https://user-images.githubusercontent.com/100874055/208572395-37324cfb-3f8f-4c92-ad3e-e1cc531bd7f2.png)
