@@ -12,4 +12,4 @@ Tools include:
 7. Samtools index, idxstats, flagstat, faidx
 8. Freebayes
 
-![DAG](C:/Users/amona/Downloads/dag.png)
+
