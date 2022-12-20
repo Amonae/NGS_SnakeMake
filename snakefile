@@ -1,6 +1,8 @@
 
 rule all:
     input: 
+       "QC/example_R1.html",
+       "QC/example_R2.html",
        "calls/example.vcf",
        "mapped/example.bam.idxstats",
        "mapped/example_dedup.bam.flagstat"
